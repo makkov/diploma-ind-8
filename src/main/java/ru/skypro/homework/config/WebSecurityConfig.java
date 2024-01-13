@@ -2,6 +2,7 @@ package ru.skypro.homework.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,11 +30,16 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf()
-                .disable()
+                .disable().
+                userDetailsService(userDetailsService)
                 .authorizeHttpRequests(
                         authorization ->
                                 authorization
+                                        .antMatchers(HttpMethod.OPTIONS)
+                                        .permitAll()
                                         .mvcMatchers(AUTH_WHITELIST)
+                                        .permitAll()
+                                        .antMatchers(HttpMethod.GET, "/ads", "/ads/image/**", "/user/image/**")
                                         .permitAll()
                                         .mvcMatchers("/ads/**", "/users/**")
                                         .authenticated())
